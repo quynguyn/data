@@ -42,11 +42,6 @@ public class Main {
             }
         }
 
-        //working on exhaustive search
-
-
-
-
         String path = "";
         int pos_x = 0;
         int pos_y = 0;
@@ -57,50 +52,41 @@ public class Main {
         print_maze(maze,row,col);
         exhaustive_search(maze,pos_x,pos_y,count,row,col,path);
     }
-    //move left
-    //move down
-    //pick up gold
-    //mark path
-    //gold count
-    //steps count
+
 
     public static void exhaustive_search(char [][] maze, int pos_x, int pos_y, int count, int row, int col, String path)
     {
-        System.out.println(maze[pos_x][pos_y]+ "\ncount: "+ count +"\nPath: "+ path);
+        //System.out.println(maze[pos_x][pos_y]+ "\ncount: "+ count +"\nPath: "+ path);
         //check for Down
-        if(pos_y < row-1) {
-            if (maze[pos_x][pos_y + 1] == 'X') {
-                System.out.println("Result: \ncount-" + count + "\nPath- " + path);
+        if(pos_x == row-1 || maze[pos_x + 1][pos_y] == 'X') {
+                System.out.println("----------\nResult: \ncount-" + count + "\nPath- " + path);
                 return;
             }
+        //check for Right
+        if (pos_y == col-1 || maze[pos_x][pos_y + 1] == 'X') {
+                System.out.println("----------\nResult: \ncount-" + count + "\nPath- " + path);
+                return;
         }
         //move Down
-        pos_y +=1;
-        if (maze[pos_x][pos_y] != '.'){
-            char x = maze[pos_x][pos_y];
-            count += Integer.parseInt(String.valueOf(x));
-            path+= "D";
-            exhaustive_search(maze,pos_x,pos_y,count,row,col,path);
+//        pos_x +=1;
+        //char x = maze[pos_x][pos_y];
+        if (maze[pos_x][pos_y] != '.') {
+            count += Integer.parseInt(String.valueOf(maze[pos_x][pos_y]));
         }
-        //check for Right
-        if (pos_x < col-1) {
-            if (maze[pos_x + 1][pos_y] == 'X') {
-                System.out.println("Result: \ncount-" + count + "\nPath- " + path);
-                return;
-            }
-        }
+        path+= "D";
+        exhaustive_search(maze,pos_x+1,pos_y,count,row,col,path);
 
         //move Right
-        pos_x+=1;
+//        pos_y+=1;
+        //char x = ;
         if (maze[pos_x][pos_y]!='.') {
-            char x = maze[pos_x][pos_y];
-            count += Integer.parseInt(String.valueOf(x));
-            path += "R";
-            exhaustive_search(maze,pos_x,pos_y,count,row,col,path);
+            count += Integer.parseInt(String.valueOf(maze[pos_x][pos_y]));
         }
+        path += "R";
+        exhaustive_search(maze,pos_x,pos_y+1,count,row,col,path);
 
         // end
-        System.out.println(path);
+        //System.out.println(path);
     }
 
     public static void print_maze(char[][] maze, int row, int col) {
