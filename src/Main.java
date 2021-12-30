@@ -2,11 +2,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-
+class variable{
+    public static int highest;
+    public static String realPath = "";
+}
 public class Main {
+
+
+
     public static void main (String[] args) throws FileNotFoundException {
         // read file
-        File map = new File("C:\\Users\\quyng\\Documents\\Sem3_2021\\src\\map1.txt");
+        File map = new File("C:\\Users\\quyng\\Documents\\Sem3_2021\\src\\map.txt");
         Scanner scan = new Scanner(map);
         // taking row and col in the file
         int row, col;
@@ -46,47 +52,50 @@ public class Main {
         int pos_x = 0;
         int pos_y = 0;
         int count = 0;
+        int step = 0;
+        String direction = "";
         System.out.println(highest_gold);
 
         //print_last_gold(maze,row,col);
         print_maze(maze,row,col);
-        exhaustive_search(maze,pos_x,pos_y,count,row,col,path);
+
+        exhaustive_search(maze,pos_x,pos_y,count,row,col,step,direction,path);
+        System.out.println("final: "+variable.highest + " - "+ variable.realPath);
     }
 
 
-    public static void exhaustive_search(char [][] maze, int pos_x, int pos_y, int count, int row, int col, String path)
-    {
-        //System.out.println(maze[pos_x][pos_y]+ "\ncount: "+ count +"\nPath: "+ path);
-        //check for Down
-        if(pos_x == row-1 || maze[pos_x + 1][pos_y] == 'X') {
-                System.out.println("----------\nResult: \ncount-" + count + "\nPath- " + path);
-                return;
-            }
-        //check for Right
-        if (pos_y == col-1 || maze[pos_x][pos_y + 1] == 'X') {
-                System.out.println("----------\nResult: \ncount-" + count + "\nPath- " + path);
-                return;
+    public static void comparePath(int count, String path){
+        if(count > variable.highest){
+            variable.highest = count;
+            variable.realPath = path;
         }
-        //move Down
-//        pos_x +=1;
-        //char x = maze[pos_x][pos_y];
+        else if (count == variable.highest && variable.realPath.length() > path.length() ){
+            variable.realPath = path;
+        }
+    }
+
+    public static String exhaustive_search(char [][] maze, int pos_x, int pos_y, int count, int row, int col,int step,String direction, String path)
+    {
+        //end of recursion
+        if (pos_x == row || pos_y == col){
+            return "";
+        }
+        if (maze[pos_x][pos_y] == 'X'){
+            return "";
+        }
+        // recursion
         if (maze[pos_x][pos_y] != '.') {
             count += Integer.parseInt(String.valueOf(maze[pos_x][pos_y]));
         }
-        path+= "D";
-        exhaustive_search(maze,pos_x+1,pos_y,count,row,col,path);
+        path += direction;
 
-        //move Right
-//        pos_y+=1;
-        //char x = ;
-        if (maze[pos_x][pos_y]!='.') {
-            count += Integer.parseInt(String.valueOf(maze[pos_x][pos_y]));
-        }
-        path += "R";
-        exhaustive_search(maze,pos_x,pos_y+1,count,row,col,path);
 
-        // end
-        //System.out.println(path);
+        comparePath(count,path);
+        exhaustive_search(maze, pos_x+1, pos_y, count, row, col,step, direction ="D",path);
+        exhaustive_search(maze, pos_x, pos_y+1, count, row, col,step, direction ="R",path);
+        path = "";
+
+        return path;
     }
 
     public static void print_maze(char[][] maze, int row, int col) {
