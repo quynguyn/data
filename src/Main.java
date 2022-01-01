@@ -5,11 +5,9 @@ import java.util.Scanner;
 class variable{
     public static int highest;
     public static String realPath = "";
+    public static int walk;
 }
 public class Main {
-
-
-
     public static void main (String[] args) throws FileNotFoundException {
         // read file
         File map = new File("C:\\Users\\quyng\\Documents\\Sem3_2021\\src\\map.txt");
@@ -20,7 +18,7 @@ public class Main {
         String [] rowNcol = size.split(" ");
         row = Integer.parseInt(rowNcol[0]);
         col = Integer.parseInt(rowNcol[1]);
-        System.out.println(row+ " "+ col);
+//        System.out.println(row+ " "+ col);
 
         // taking every char in the map
         char [][] maze = new char[row][col];
@@ -60,28 +58,30 @@ public class Main {
         print_maze(maze,row,col);
 
         exhaustive_search(maze,pos_x,pos_y,count,row,col,step,direction,path);
-        System.out.println("final: "+variable.highest + " - "+ variable.realPath);
+        System.out.println("final: Step("+ variable.walk +") - "+variable.highest + " - "+ variable.realPath);
     }
 
 
-    public static void comparePath(int count, String path){
+    public static void comparePath(int count, String path,int step){
         if(count > variable.highest){
             variable.highest = count;
             variable.realPath = path;
+            variable.walk = step;
         }
         else if (count == variable.highest && variable.realPath.length() > path.length() ){
             variable.realPath = path;
+            variable.walk = step;
         }
     }
 
-    public static String exhaustive_search(char [][] maze, int pos_x, int pos_y, int count, int row, int col,int step,String direction, String path)
+    public static void exhaustive_search(char [][] maze, int pos_x, int pos_y, int count, int row, int col,int step,String direction, String path)
     {
         //end of recursion
         if (pos_x == row || pos_y == col){
-            return "";
+            return ;
         }
         if (maze[pos_x][pos_y] == 'X'){
-            return "";
+            return ;
         }
         // recursion
         if (maze[pos_x][pos_y] != '.') {
@@ -90,12 +90,10 @@ public class Main {
         path += direction;
 
 
-        comparePath(count,path);
-        exhaustive_search(maze, pos_x+1, pos_y, count, row, col,step, direction ="D",path);
-        exhaustive_search(maze, pos_x, pos_y+1, count, row, col,step, direction ="R",path);
-        path = "";
+        comparePath(count,path,step);
+        exhaustive_search(maze, pos_x+1, pos_y, count, row, col,step+1, "D",path);
+        exhaustive_search(maze, pos_x, pos_y+1, count, row, col, step + 1, "R",path);
 
-        return path;
     }
 
     public static void print_maze(char[][] maze, int row, int col) {
