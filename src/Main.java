@@ -2,16 +2,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-class variable{
-    public static int highest;
-    public static String realPath = "";
-    public static int walk;
-}
 public class Main {
     static char[][] printPath;
+    static int highest;
+    static String realPath = "";
+    static int walk;
+    static int time = 0;
 
     public static void main (String[] args) throws FileNotFoundException {
         // read file
+        System.out.println("Enter file map's name: ");
         Scanner inputFile = new Scanner(System.in);
         File map = new File(inputFile.nextLine());
         Scanner scan = new Scanner(map);
@@ -61,51 +61,51 @@ public class Main {
         int pos_y = 0;
         int count = 0;
         int step = 0;
+
         String direction = "";
-        System.out.println(highest_gold);
+        //System.out.println(highest_gold);
 
         //print_last_gold(maze,row,col);
         print_maze(maze,row,col);
 
         exhaustive_search(maze,pos_x,pos_y,count,row,col,step,direction,path);
-        System.out.println("final: Step("+ variable.walk +") - "+variable.highest + " - "+ variable.realPath);
-        exhaustive_search(maze, pos_x,pos_y,count,row,col,step,direction,path);
-        System.out.println("\nfinal: "+variable.highest + " - "+ variable.realPath);
-
+        System.out.println("final: Step("+ walk +") - "+highest + " - "+ realPath);
+        System.out.println(time);
+        change_maze(maze);
+        print_maze(maze, row, col);
+    }
+    public static void change_maze(char [][] maze){
         int pathRow = 0;
         int pathCol = 0;
-        printPath[pathRow][pathCol] = '+';
-        for (int i = 0; i < variable.realPath.length(); i++) {
-            if (variable.realPath.charAt(i) == 'D') {
+        maze[pathRow][pathCol] = '+';
+        for (int i = 0; i < realPath.length(); i++) {
+            if (realPath.charAt(i) == 'D') {
                 pathRow++;
-            } else if (variable.realPath.charAt(i) == 'R') {
+            } else if (realPath.charAt(i) == 'R') {
                 pathCol++;
             }
-            if (printPath[pathRow][pathCol] == '.') {
-                printPath[pathRow][pathCol] = '+';
-            } else if (printPath[pathRow][pathCol] != '.') {
-                printPath[pathRow][pathCol] = 'G';
+            if (maze[pathRow][pathCol] == '.') {
+                maze[pathRow][pathCol] = '+';
+            } else{
+                maze[pathRow][pathCol] = 'G';
             }
         }
-
-        System.out.println();
-        print_maze(printPath, row, col);
     }
-
 
     public static void comparePath(int count, String path,int step){
-        if(count > variable.highest){
-            variable.highest = count;
-            variable.realPath = path;
-            variable.walk = step;
+        if(count > highest){
+            highest = count;
+            realPath = path;
+            walk = step;
         }
-        else if (count == variable.highest && variable.realPath.length() > path.length() ){
-            variable.realPath = path;
-            variable.walk = step;
+        else if (count == highest && realPath.length() > path.length() ){
+            realPath = path;
+            walk = step;
         }
     }
 
-    public static void exhaustive_search(char [][] maze, int pos_x, int pos_y, int count, int row, int col,int step,String direction, String path)
+    public static void exhaustive_search(char [][] maze, int pos_x, int pos_y, int count, int row, int col,int step,
+                                         String direction, String path)
     {
 
         //end of recursion
@@ -125,7 +125,7 @@ public class Main {
         comparePath(count,path,step);
         exhaustive_search(maze, pos_x+1, pos_y, count, row, col,step+1, "D",path);
         exhaustive_search(maze, pos_x, pos_y+1, count, row, col, step + 1, "R",path);
-
+        time++;
     }
 
     public static void print_maze(char[][] maze, int row, int col) {
