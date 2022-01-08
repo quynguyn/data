@@ -24,7 +24,9 @@ public class Main {
         // read file
         System.out.println("Enter file map's name: ");
         Scanner inputFile = new Scanner(System.in);
-        File map = new File(inputFile.nextLine());
+        String fileName = inputFile.nextLine();
+        fileName = "src/" + fileName;
+        File map = new File(fileName);
         Scanner scan = new Scanner(map);
 
         // taking row and col in the file
