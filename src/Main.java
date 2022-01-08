@@ -36,10 +36,6 @@ public class Main {
             System.out.println("Map is not valid, please try again.");
             return;
         }
-//        String size = scan.nextLine();
-//        String[] rowNcol = size.split(" ");
-//        row = Integer.parseInt(rowNcol[0]);
-//        col = Integer.parseInt(rowNcol[1]);
         System.out.println(row+ " "+ col);
 
         // taking every char in the map
@@ -61,9 +57,9 @@ public class Main {
 
 
         print_maze(maze, row, col);
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         exhaustive_search(maze, pos_x, pos_y, count, row, col, step, direction, path);
-        long finish = System.currentTimeMillis();
+        long finish = System.nanoTime();
         long timeElapsed = finish - start;
 
         change_maze(maze);
@@ -112,7 +108,6 @@ public class Main {
         if (memo.contains(temp))
         {
             comparePath(count, path, step);
-            System.out.println("co chay.");
             System.out.println(memo.get(memo.indexOf(temp)));
             memo.indexOf(temp);
             time++;
