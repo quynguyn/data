@@ -1,7 +1,10 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.io.FileInputStream;
+
 
 public class Main {
     static int highest;
@@ -10,7 +13,7 @@ public class Main {
     static ArrayList<String> memo = new ArrayList<>();
     static int time;
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) {
         String path = "";
         String direction = "";
         int pos_x = 0;
@@ -20,15 +23,26 @@ public class Main {
         int count_row = 0, count_col = 0;
         int row, col;
 
+        Scanner keyboard = new Scanner(System.in);
 
-        // read file
-        System.out.println("Enter file map's name: ");
-        Scanner inputFile = new Scanner(System.in);
-        String fileName = inputFile.nextLine();
-        fileName = "src/" + fileName;
-        File map = new File(fileName);
+
+        FileInputStream map = null;
+
+        boolean checkFile = true;
+        do {
+            // read file
+            System.out.println("Enter file map's name: ");
+            String fileName = keyboard.nextLine();
+            fileName = "src/" + fileName;
+            try {
+                map = new FileInputStream(fileName);
+                checkFile = false;
+            } catch (FileNotFoundException e) {
+                System.out.println("File does not found!!\n");
+            }
+        } while(checkFile);
+
         Scanner scan = new Scanner(map);
-
         // taking row and col in the file
 
         row = scan.nextInt();
@@ -116,6 +130,7 @@ public class Main {
             }
         }
     }
+
 
     public static void comparePath(int count, String path, int step) {
         if (count > highest) {
