@@ -1,17 +1,12 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Scanner;
-import java.util.ArrayList;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 
 public class Main {
     static int highest;
     static String realPath = "";
     static int walk;
-//    static ArrayList<String> memo = new ArrayList<>();
-    static int time;
     static String[][] secondMaze;
     static int maxGold = 0;
     static int maxPosX = 0;
@@ -19,6 +14,8 @@ public class Main {
     static int up = 0;
     static int left = 0;
     static int temp = 0;
+    static boolean x_axis = false;
+    static boolean y_axis = false;
 
 
     public static void main(String[] args) {
@@ -82,67 +79,83 @@ public class Main {
 //
         // run code
         long start = System.nanoTime();
-        secondMaze = makeMemoMaze(maze,row,col);
-//        exhaustive_search(maze, pos_x, pos_y, count, row, col, step, direction, path);
-        dynamic_search(maze, direction, path, count);
 
+//        exhaustive_search(maze, pos_x, pos_y, count, row, col, step, direction, path);
+        secondMaze = makeMemoMaze(maze,row,col);
+//        print_maze(secondMaze,row,col);
+        dynamic_search(maze, path, count);
         long finish = System.nanoTime();
         long timeElapsed = finish - start;
 
 
-
         change_maze(maze);
         System.out.println("------------------------------------------------------------------");
-        print_maze(secondMaze, row, col);
+        print_maze(maze, row, col);
         System.out.println("time code run: "+ timeElapsed);
         System.out.println("final: Step(" + walk + ") - " + highest + " - " + realPath);
-        System.out.println(time);
     }
 
-    public static void dynamic_search(String[][] maze, String direction, String path, int count) {
+    public static void dynamic_search(String[][] maze, String path, int count) {
 
-        int up_value;
-        int left_value;
+//        System.out.println(maxPosX + " "+ maxPosY);
+        int up_value = 0;
+        int left_value = 0;
 
-        if(maxPosX == 0 && maxPosY == 0){
+        if(maxPosX <= 0 && maxPosY <= 0){
+            dynamicPath(count, path);
             return;
-        }
-        // check up
-        if(maxPosX > 1) {
-            if (secondMaze[maxPosX - 1][maxPosY].equals("X")) {
-                up_value = Integer.parseInt(secondMaze[maxPosX - 1][maxPosY]);
-            }
-            else if (!secondMaze[maxPosX - 1][maxPosY].equals("x")){
-
-            }
-        }
-        else {
-            up_value = -1;
-        }
-        //
-        if(maxPosY > 1){
-            left_value = Integer.parseInt(secondMaze[maxPosX][maxPosY-1]);
-        }
-        else{
-            left_value = -1;
         }
 
         if(!maze[maxPosX][maxPosY].equals(".")){
             count += Integer.parseInt(String.valueOf(maze[maxPosX][maxPosY]));
         }
-        path += direction;
-//        if(maxPosY == 0 && maxPosX > 1){
-//            maxPosX = maxPosX-1;
-//            dynamic_search(maze, "D", path, count);
-//        }
-        if(up_value > left_value){
-            maxPosX = maxPosX-1;
-            dynamic_search(maze, "D", path, count);
+//         check up
+        if(maxPosX >= 0) {
+            if(maxPosX -1 < 0){
+                up_value = -1;
+            }
+            else if (maze[maxPosX - 1][maxPosY].equals("X")) {
+                up_value = -1;
+            }
+            else if (maze[maxPosX - 1][maxPosY].equals(".") ||!maze[maxPosX - 1][maxPosY].equals(".")  ) {
+                up_value = Integer.parseInt(secondMaze[maxPosX - 1][maxPosY]);
+            }
+        }
+        else {
+            up_value = -1;
+        }
+        // check left
+        if(maxPosY >= 0) {
+            if(maxPosY -1 < 0){
+                left_value = -1;
+            }
+            else if (maze[maxPosX][maxPosY-1].equals("X")){
+                left_value = -1;
+            }
+            else if (maze[maxPosX][maxPosY-1].equals(".")||!maze[maxPosX][maxPosY-1].equals(".")) {
+                left_value = Integer.parseInt(secondMaze[maxPosX ][maxPosY-1]);
+            }
+        }
+        else {
+            left_value = -1;
         }
 
-        realPath = path;
-        highest = count;
-        walk = path.length();
+        // checking for path
+        if(up_value > left_value){
+            path += "D";
+            maxPosX -= 1;
+            dynamic_search(maze, path, count);
+        }
+        if (left_value > up_value) {
+            maxPosY -= 1;
+            path += "R";
+            dynamic_search(maze, path, count);
+        }
+        if (left_value == up_value){
+            path += "D";
+            maxPosX -= 1;
+            dynamic_search(maze, path, count);
+        }
     }
     public static void exhaustive_search(String[][] maze, int pos_x, int pos_y, int count, int row, int col, int step,
                                          String direction, String path) {
@@ -163,7 +176,6 @@ public class Main {
         // recursion
         exhaustive_search(maze, pos_x + 1, pos_y, count, row, col, step + 1, "D", path);
         exhaustive_search(maze, pos_x, pos_y + 1, count, row, col, step + 1, "R", path);
-        time++;
     }
 
     public static void print_maze(String[][] maze, int row, int col) {
@@ -192,7 +204,17 @@ public class Main {
         }
     }
 
-
+    public static String reverseString (String path){
+        StringBuilder newPath = new StringBuilder(path);
+        newPath.reverse();
+        return newPath.toString();
+    }
+    public static void dynamicPath(int count, String path){
+        if(path.length() > realPath.length() && count > highest)
+        realPath = reverseString(path);
+        highest = count;
+        walk = realPath.length();
+    }
     public static void comparePath(int count, String path, int step) {
         if (count > highest) {
             highest = count;
@@ -203,6 +225,7 @@ public class Main {
             walk = step;
         }
     }
+
     public static String [][] makeMemoMaze(String [][]maze,int row,int col){
         String[][] newMaze = new String[row][col];
         for(int x = 0; x < row; x ++)
@@ -221,21 +244,20 @@ public class Main {
                 if(maze[x][y].equals("X")){
                     temp = 0;
                     newMaze[x][y] ="X";
-                    if(x==0 && y < col -1) {
-                        y++;
-                        while(y < col) {
-                            newMaze[x][y] = "0";
-                            y++;
-                        }
+                    if(y == 0){
+                        x_axis = true;
                     }
-                    if(y == 0 && x < row -1) {
-                        x++;
-                        while(x < row) {
-                            newMaze[x][y] = "0";
-                            x++;
-                        }
+                    if (x == 0){
+                        y_axis = true;
                     }
-                    //temp = Integer.parseInt(String.valueOf(maze[x][y]));
+                    continue;
+                }
+                if(x_axis && y == 0){
+                    newMaze[x][y] = "0";
+                    continue;
+                }
+                if(y_axis && x == 0){
+                    newMaze[x][y] = "0";
                     continue;
                 }
                 if(maze[x][y].equals("."))
@@ -246,7 +268,7 @@ public class Main {
                     if(y != 0 && !maze[x][y - 1].equals("X")) {
                         left = Integer.parseInt(String.valueOf(newMaze[x][y - 1]));
                     }
-                    Integer value = up + left ;
+                    int value = up + left ;
                     newMaze[x][y] = Integer.toString(value);
                     if(value > maxGold){
                         maxPosX = x;
@@ -259,23 +281,18 @@ public class Main {
                 }
                 if(!maze[x][y].equals(".") && x == 0){
                     temp = Integer.parseInt(maze[x][y]) + Integer.parseInt(newMaze[x][y-1]);
-                    Integer value = temp;
+                    int value = temp;
                     newMaze[x][y] = Integer.toString(value);
                     if(value > maxGold){
                         maxPosX = x;
                         maxPosY = y;
                         maxGold = value;
                     }
-//                    newMaze[x][y] = (char)('0'+temp);
-//                    temp = 0;
-//                    System.out.println(newMaze[x][y]);
                 }
                 else if(!maze[x][y].equals(".") && y==0){
                     temp = Integer.parseInt(String.valueOf(maze[x][y])) + Integer.parseInt(String.valueOf(newMaze[x-1][y]));
-                    Integer value = temp;
+                    int value = temp;
                     newMaze[x][y] = Integer.toString(value);
-//                    newMaze[x][y] = (char)('0'+temp);
-//                    temp = 0;
                     if(value > maxGold){
                         maxPosX = x;
                         maxPosY = y;
@@ -299,147 +316,10 @@ public class Main {
                         maxPosY = y;
                         maxGold = value;
                     }
-//                    newMaze[x][y] = (char)('0'+temp);
-//                    temp = 0;
                 }
-//                if(y==col-1) temp = 0;
             }
             temp = 0;
         }
         return newMaze;
     }
 }
-// for(int x = 0; x < row; x ++)
-//        {
-//            for(int y = 0; y < col; y++)
-//            {
-//                if(x== 0 && y== 0){
-//                    newMaze[x][y] = "0";
-//                    continue;
-//                }
-//                if(temp > maxGold){
-//                    maxPosX = x;
-//                    maxPosy = y;
-//                    maxGold = temp;
-//                }
-//                if(maze[x][y].equals("X")){
-//                    temp = 0;
-//                    newMaze[x][y] ="X";
-//                    if(x==0 && y < col -1) {
-//                        y++;
-//                        while(y < col) {
-//                            newMaze[x][y] = "0";
-//                            y++;
-//                        }
-//                    }
-//                    if(y == 0 && x < row -1) {
-//                        x++;
-//                        while(x < row) {
-//                            newMaze[x][y] = "0";
-//                            x++;
-//                        }
-//                    }
-//                    //temp = Integer.parseInt(String.valueOf(maze[x][y]));
-//                    continue;
-//                }
-//                if(maze[x][y].equals("."))
-//                {
-//                    if(x!= 0 && !maze[x - 1][y].equals("X")){
-//                        up = Integer.parseInt(String.valueOf(newMaze[x-1][y]));
-//                    }
-//                    if(y != 0 && !maze[x][y - 1].equals("X")) {
-//                        left = Integer.parseInt(String.valueOf(newMaze[x][y - 1]));
-//                    }
-//                    Integer value = up + left ;
-//                    newMaze[x][y] = Integer.toString(value);
-//                    if(value > maxGold){
-//                        maxPosX = x;
-//                        maxPosy = y;
-//                        maxGold = value;
-//                    }
-//                    up = 0;
-//                    left =0;
-//                    continue;
-//                }
-//                if(!maze[x][y].equals(".") && x == 0){
-//                    temp = Integer.parseInt(maze[x][y]) + Integer.parseInt(newMaze[x][y-1]);
-//                    Integer value = temp;
-//                    newMaze[x][y] = Integer.toString(value);
-//                    if(value > maxGold){
-//                        maxPosX = x;
-//                        maxPosy = y;
-//                        maxGold = value;
-//                    }
-////                    newMaze[x][y] = (char)('0'+temp);
-////                    temp = 0;
-////                    System.out.println(newMaze[x][y]);
-//                }
-//                else if(!maze[x][y].equals(".") && y==0){
-//                    temp = Integer.parseInt(String.valueOf(maze[x][y])) + Integer.parseInt(String.valueOf(newMaze[x-1][y]));
-//                    Integer value = temp;
-//                    newMaze[x][y] = Integer.toString(value);
-////                    newMaze[x][y] = (char)('0'+temp);
-////                    temp = 0;
-//                    if(value > maxGold){
-//                        maxPosX = x;
-//                        maxPosy = y;
-//                        maxGold = value;
-//                    }
-//                }
-//                else if(!maze[x][y].equals(".")){
-//                    if(!maze[x - 1][y].equals("X")){
-//                        up = Integer.parseInt(String.valueOf(newMaze[x-1][y]));
-//                    }
-//                    if(!maze[x][y - 1].equals("X")){
-//                        left = Integer.parseInt(String.valueOf(newMaze[x][y-1]));
-//                    }
-//                    temp = up + left + Integer.parseInt(String.valueOf(maze[x][y]));
-//                    up = 0;
-//                    left =0;
-//                    int value = temp;
-//                    newMaze[x][y] = Integer.toString(value);
-//                    if(value > maxGold){
-//                        maxPosX = x;
-//                        maxPosy = y;
-//                        maxGold = value;
-//                    }
-////                    newMaze[x][y] = (char)('0'+temp);
-////                    temp = 0;
-//                }
-////                if(y==col-1) temp = 0;
-//            }
-//            temp = 0;
-//        }
-
-
-//        System.out.println("------------------------------------------------------------------");
-//        System.out.println(maxPosX + " " + maxPosy);
-//        print_maze(newMaze, row, col);
-//end of recursion
-////        String temp =step + "/"+count+"/"+path;
-//        if (memo.contains(temp))
-//        {
-//            comparePath(count, path, step);
-//            System.out.println(memo.get(memo.indexOf(temp)));
-//            memo.indexOf(temp);
-//            time++;
-//            return;
-//        }
-//        if (pos_x == row || pos_y == col) {
-//            return;
-//        }
-//        if (maze[pos_x][pos_y] == 'X') {
-//            return;
-//        }
-//        // recursion
-//        if (maze[pos_x][pos_y] != '.') {
-//            count += Integer.parseInt(String.valueOf(maze[pos_x][pos_y]));
-//        }
-//        path += direction;
-//        comparePath(count, path, step);
-//        dynamic_search(maze, pos_x + 1, pos_y, count, row, col, step + 1, "D", path);
-//        dynamic_search(maze, pos_x, pos_y + 1, count, row, col, step + 1, "R", path);
-//        memo.add(temp);
-//        time++;
-//    }
-
